@@ -1,0 +1,53 @@
+--- The first reader-writer model.
+
+fmod LABEL is
+    sort Label .
+    ops rs ws cs : -> Label [ctor] .
+endfm
+
+mod READER-WRITER-1 is
+    including QUEUE .
+    including NAT .
+    pr LABEL .
+
+    sorts OCom Config .
+    subsort OCom < Config .
+    op __ : Config Config -> Config [ctor assoc comm] .
+    op wp[_]:_ : Pid Label -> OCom [ctor] .
+    op rp[_]:_ : Pid Label -> OCom [ctor] .
+    op queue:_ : Queue -> OCom [ctor] .
+    op readers:_ : Nat -> OCom [ctor] .
+    op ic : -> Config .
+    eq ic = (wp[p(1)]: rs) (wp[p(2)]: rs)
+            (rp[p(4)]: rs) (rp[p(5)]: rs)
+            (readers: 0) (queue: empty) .
+
+    var i : NzNat .
+    var count : Nat .
+    var Q : Queue .
+
+    crl [reader-wait] : (rp[p(i)]: rs) (readers: count) (queue: Q) => 
+                    (rp[p(i)]: ws) (readers: count) (queue: enq(Q, p(i)))
+                    if count == 0 .
+    
+    rl [writer-wait] : (wp[p(i)]: rs) (queue: Q) => (wp[p(i)]: ws) (queue: enq(Q, p(i))) .
+
+    crl [reader-try-1] : (rp[p(i)]: rs) (readers: count) => 
+                    (rp[p(i)]: cs) (readers: (count + 1))
+                    if count > 0 .
+
+    rl [reader-try-2] : (rp[p(i)]: ws) (readers: count) (queue: (p(i) | Q)) => 
+                    (rp[p(i)]: cs) (readers: (count + 1)) (queue: (p(i) | Q)) .
+
+    rl [writer-try] : (wp[p(i)]: ws) (queue: (p(i) | Q)) => (wp[p(i)]: cs) (queue: (p(i) | Q)) .
+
+    crl [reader-exit-1] : (rp[p(i)]: cs) (readers: count) => 
+                        (rp[p(i)]: rs) (readers: sd(count, 1)) 
+                        if count > 1 .
+
+    crl [reader-exit-2] : (rp[p(i)]: cs) (readers: count) (queue: Q) => 
+                        (rp[p(i)]: rs) (readers: sd(count, 1)) (queue: deq(Q))
+                        if count == 1 .
+    
+    rl [writer-exit]: (wp[p(i)]: cs) (queue: Q) => (wp[p(i)]: rs) (queue: deq(Q)) .
+endm

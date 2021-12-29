@@ -1,0 +1,14 @@
+fmod QUEUE is
+    including PID .
+    sort Queue .
+    op empty : -> Queue [ctor] .
+    op _|_ : Pid Queue -> Queue [ctor] .
+    op enq : Queue Pid -> Queue .
+    op deq : Queue -> Queue .
+    var Q : Queue .
+    vars X Y : Pid .
+    eq enq(empty, X) = X | empty .
+    eq enq(Y | Q, X) = Y | enq(Q, X) .
+    eq deq(empty) = empty .
+    eq deq(X | Q) = Q .
+endfm 

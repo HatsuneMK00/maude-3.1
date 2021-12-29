@@ -1,0 +1,5 @@
+fmod PID is
+    including NAT .
+    sort Pid .
+    op p : NzNat -> Pid [ctor] .
+endfm
