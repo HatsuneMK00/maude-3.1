@@ -1,0 +1,61 @@
+--- The second reader-writer model where reader and writer has equal priority.
+
+fmod LABEL is
+    sort Label .
+    ops rs ws cs wrws : -> Label [ctor] .
+endfm
+
+mod READER-WRITER-2 is
+    including QUEUE .
+    including NAT .
+    pr LABEL .
+
+    sorts OCom Config .
+    subsort OCom < Config .
+    op __ : Config Config -> Config [ctor assoc comm] .
+    op wp[_]:_ : Pid Label -> OCom [ctor] .
+    op rp[_]:_ : Pid Label -> OCom [ctor] .
+    op waiting:_ : Queue -> OCom [ctor] .
+    op waitingrw:_ : Queue -> OCom [ctor] .
+    op readers:_ : Nat -> OCom [ctor] .
+    op ic : -> Config .
+    eq ic = (wp[p(1)]: rs) (wp[p(2)]: rs)
+            (rp[p(4)]: rs) (rp[p(5)]: rs)
+            (readers: 0) (waiting: empty) (waitingrw: empty) .
+
+    var i : NzNat .
+    var count : Nat .
+    vars QRW QW  : Queue .
+
+    rl [reader-wait] : (rp[p(i)]: rs) (waiting: QW) => (rp[p(i)]: ws) (waiting: enq(QW, p(i))) .
+    
+    rl [writer-wait] : (wp[p(i)]: rs) (waiting: QW) => (wp[p(i)]: ws) (waiting: enq(QW, p(i))) .
+
+    crl [reader-wait-rw] : (rp[p(i)]: ws) (readers: count) (waiting: (p(i) | QW)) (waitingrw: QRW) => 
+                    (rp[p(i)]: wrws) (readers: count) (waiting: (p(i) | QW)) (waitingrw: enq(QRW, p(i))) 
+                    if count == 0 .
+
+    crl [reader-try-rw-1] : (rp[p(i)]: ws) (readers: count) (waiting: (p(i) | QW)) => 
+                        (rp[p(i)]: cs) (readers: (count + 1)) (waiting: deq(QW)) 
+                        if count > 0 .
+
+    rl [reader-try-rw-2] : (rp[p(i)]: wrws) (readers: count) (waiting: (p(i) | QW)) (waitingrw: (p(i) | QRW)) => 
+                    (rp[p(i)]: cs) (readers: (count + 1)) (waiting: deq(QW)) (waitingrw: (p(i) | QRW)) .
+
+    rl [writer-wait-rw] : (wp[p(i)]: ws) (waiting: (p(i) | QW)) (waitingrw: QRW) => 
+                        (wp[p(i)]: wrws) (waiting: (p(i) | QW)) (waitingrw: enq(QRW, p(i))) .
+                    
+    rl [writer-try-rw] : (wp[p(i)]: wrws) (waiting: (p(i) | QW)) (waitingrw: (p(i) | QRW)) => 
+                        (wp[p(i)]: cs) (waiting: (p(i) | QW)) (waitingrw: (p(i) | QRW)) .
+
+    crl [reader-exit-1] : (rp[p(i)]: cs) (readers: count) => 
+                        (rp[p(i)]: rs) (readers: sd(count, 1)) 
+                        if count > 1 .
+
+    crl [reader-exit-2] : (rp[p(i)]: cs) (readers: count) (waitingrw: QRW) => 
+                        (rp[p(i)]: rs) (readers: sd(count, 1)) (waitingrw: deq(QRW))
+                        if count == 1 .
+
+    rl [writer-exit] : (wp[p(i)]: cs) (waiting: QW) (waitingrw: QRW) => 
+                    (wp[p(i)]: rs) (waiting: deq(QW)) (waitingrw: deq(QRW)).
+endm
