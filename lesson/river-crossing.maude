@@ -1,0 +1,31 @@
+--- runable
+mod RIVER-CROSSING is
+    sorts Side Group .
+    ops left right : -> Side [ctor] .
+    op change : Side -> Side .
+    eq change(left) = right .
+    eq change(right) = left .
+
+    ops s w l c : Side -> Group [ctor] .
+    op _ _ : Group Group -> Group [ctor assoc comm] .
+
+    vars S S1 S2 S3 : Side .
+
+    op isSafe : Group -> Bool .
+    eq isSafe(s(S) G:Group) = true .
+    eq isSafe(w(S1) l(S2) c(S3)) = (S1 =/= S2) and (S2 =/= S3) .
+    eq isSafe(w(S1) l(S2)) = (S1 =/= S2) .
+    eq isSafe(l(S2) c(S3)) = (S2 =/= S3) .
+    eq isSafe(w(S1) c(S2)) = true .
+
+    crl [shepherd] : s(S) w(S1) l(S2) c(S3) => 
+    s(change(S)) w(S1) l(S2) c(S3) if isSafe(w(S1) l(S2) c(S3)) .
+
+    crl [wolf] : s(S) w(S) l(S1) c(S2) =>
+    s(change(S)) w(change(S)) l(S1) c(S2) if isSafe(l(S1) c(S2)) .
+
+    rl [lamb] : s(S) l(S) => s(change(S)) l(change(S)) .
+
+    crl [cabbage] : s(S) c(S) w(S1) l(S2) => 
+    s(change(S)) c(change(S)) w(S1) l(S2) if isSafe(w(S1) l(S2)) .
+endm

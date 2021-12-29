@@ -1,0 +1,54 @@
+fmod LIST-NAT is
+    including NAT .
+    sort ListNat .
+    subsort Nat < ListNat .
+    op nil : -> ListNat .
+    op _,_ : ListNat ListNat -> ListNat [assoc id: nil] .
+
+    vars n m n_prime : Nat .
+    var ln : ListNat .
+
+    op len : ListNat -> Nat .
+    eq len(n) = 1 .
+    eq len(ln, n) = len(ln) + 1 .
+
+    --- 反转一个ListNat
+    op reverse : ListNat -> ListNat .
+    eq reverse(n) = n .
+    eq reverse(ln, n) = n, reverse(ln) .
+
+    vars l1 l2 : ListNat .
+
+
+    op rm : ListNat Nat -> ListNat .
+    eq rm(m, n) = 
+        if (m == n) 
+         then (nil) 
+         else (m) fi .
+    
+    eq rm((m, ln), n) =
+        if (m == n) 
+         then (rm(ln, n)) 
+         else (m, rm(ln, n)) fi .
+
+    op fac : Nat -> Nat .
+    eq fac(0) = 1 .
+    eq fac(s(n)) = fac(n) * s(n) .
+
+    --- 将一个ListNat排序
+    op sorting : ListNat -> ListNat .
+    --- Baseline: 
+    eq sorting(nil) = nil .
+    --- Recursive definition
+    eq sorting(n, ln) = sorting(lessN(n, ln)), n, sorting(greatN(n, ln)) .
+
+    --- two sub operation: greater than n; less than n
+    op lessN : Nat ListNat -> ListNat .
+    eq lessN(n, nil) = nil .
+    eq lessN(n, (n_prime, ln)) = if (n_prime > n) then lessN(n, ln) else n_prime, lessN(n, ln) fi .
+    
+    op greatN : Nat ListNat -> ListNat .
+    eq greatN(n, nil) = nil .
+    eq greatN(n, (n_prime, ln)) = if (n_prime < n) then greatN(n, ln) else n_prime, greatN(n, ln) fi .
+
+endfm

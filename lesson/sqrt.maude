@@ -1,0 +1,18 @@
+fmod sqrt is
+    including NAT .
+
+    --- a naive implementation
+    op sqrt : Nat -> Nat .
+    op sqrt' : Nat Nat -> Nat .
+    var n r l u : Nat . 
+    eq sqrt(1) = 1 .
+    --- This is how to write a iteration in maude(a functional programming language)
+    eq sqrt(n) = sqrt'(0, n) .
+    eq sqrt'(r, n) = if (r * r <= n and ((r + 1) * (r + 1)) > n) then r else sqrt'(r + 1, n) fi .
+
+    --- binary search
+    op sqrt2 : Nat -> Nat .
+    op sqrt2' : Nat Nat Nat Nat -> Nat .
+    eq sqrt2(n) = sqrt2'(0, n, n quo 2, n) .
+    eq sqrt2'(l, u, r, n) = if (r * r == n) then r else (if (r * r < n) then sqrt2'(r, u, (r + u) quo 2, n) else sqrt2'(l, r, (l + r) quo 2, n) fi) fi .
+endfm

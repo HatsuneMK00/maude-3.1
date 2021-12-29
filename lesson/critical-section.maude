@@ -1,0 +1,51 @@
+--- label表示进程的位置 rs->remainder section, ws->waiting section, cs->critical section
+fmod LABEL is
+    sort Label .
+    ops rs ws cs : -> Label [ctor] .
+endfm
+
+--- pid表示进程的标识符 假设只有p1, p2两个进程
+fmod PID is
+    sort Pid .
+    ops p1 p2 : -> Pid [ctor] .
+endfm
+
+--- 定义一个等待队列Queue
+fmod QUEUE is
+    pr PID .
+    sort Queue .
+    op empty : -> Queue [ctor] .
+    op _|_ : Pid Queue -> Queue [ctor] .
+    op enq : Queue Pid -> Queue .
+    op deq : Queue -> Queue .
+    var Q : Queue .
+    vars X Y : Pid .
+    eq enq(empty, X) = X | empty .
+    eq enq(Y | Q, X) = Y | enq(Q, X) .
+    eq deq(empty) = empty .
+    eq deq(X | Q) = Q .
+endfm 
+
+mod QLOCK is
+    pr LABEL .
+    pr QUEUE .
+    --- Config表示状态，OCom表示状态中的一个单元
+    sort OCom Config . 
+    subsort OCom < Config .
+    op __ : Config Config -> Config [ctor assoc comm] .
+    op pc[_]:_ : Pid Label -> OCom [ctor] .
+    op queue:_ : Queue -> OCom [ctor] .
+    op ic : -> Config .
+    eq ic = (pc[p1]: rs) (pc[p2]: rs) (queue: empty) .
+
+    var I : Pid .
+    var Q : Queue .
+    --- 进程I希望进入临界区
+    rl [want] : (pc[I]: rs) (queue: Q) => (pc[I]: ws) (queue: enq(Q, I)) .
+
+    --- 如果I在队列的头部，I进入临界区
+    rl [try] : (pc[I]: ws) (queue: (I | Q)) => (pc[I]: cs) (queue: (I | Q)) .
+    
+    --- 进程I离开临界区
+    rl [exit] : (pc[I]: cs) (queue: Q) => (pc[I]: rs) (queue: deq(Q)) .
+endm

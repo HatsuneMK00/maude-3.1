@@ -1,0 +1,43 @@
+fmod BINARY-TREE is
+    including NAT .
+
+    sorts BinaryTree Leaf .
+    subsort Leaf < BinaryTree .
+
+    vars lt, rt : BinaryTree .
+    var n n' : Nat .
+
+    op leaf : -> Leaf .
+    op ((_,_,_)) : BinaryTree Nat BinaryTree -> BinaryTree .
+
+    op isBST : BinaryTree -> Bool .
+    op rightMost : BinaryTree -> Nat .
+    op leftMost : BinaryTree -> Nat .
+    eq isBST(leaf) = true .
+    eq isBST((leaf, n, leaf)) = true .
+    eq isBST((lt, n, rt)) = isBST(lt) and isBST(rt) and (n > rightMost(lt) and n < leftMost(rt)) .
+    ceq rightMost((lt, n, rt)) = n if rt == leaf .
+    eq rightMost((lt, n, rt)) = rightMost(rt) .
+    ceq leftMost((lt, n, rt)) = n if lt == leaf .
+    eq leftMost((lt, n, rt)) = leftMost(lt) .
+
+    op insert : BinaryTree Nat -> BinaryTree .
+    eq insert(leaf, n') = (leaf, n', leaf) .
+    ceq insert((lt, n, rt), n') = (lt, n, rt) if n == n' .
+    eq insert((lt, n, rt), n') = if (n' > n) then (lt, n, insert(rt, n')) else (insert(lt, n'), n, rt) fi .
+
+    op search : BinaryTree Nat -> Bool .
+    eq search(leaf, n) = false .
+    ceq search((lt, n, rt), n') = (
+        if n' > n then search(rt, n')
+        else (
+            if n' < n then search(lt, n')
+            else true fi
+        )
+        fi
+    ) if isBST((lt, n, rt)) .
+
+    op remove : BinaryTree Nat -> BinaryTree .
+    eq remove((lt, n, rt), n') = if n' > n then removeRightMost(rt, n') else removeLeftMost(lt, n') fi .
+    
+endfm

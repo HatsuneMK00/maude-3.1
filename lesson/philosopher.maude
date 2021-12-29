@@ -1,0 +1,73 @@
+fmod PHILOSOPHER is
+    protecting NAT .
+    sort Phi .
+    sort Status .
+
+    op phi : Nat -> Phi .
+
+    ops thinking hungry eating : -> Status .
+endfm
+
+fmod FORK is
+    protecting NAT .
+    sorts Fork Forks .
+    subsort Fork < Forks .
+
+    op empty : -> Forks .
+    op __ : Forks Forks -> Forks [assoc comm id: empty] .
+
+    op fork : Nat -> Fork .
+endfm
+
+mod DINING is
+    protecting FORK .
+    protecting PHILOSOPHER .
+
+    sort State .
+    op p[_]:_,_ : Phi Status Nat -> State .
+    op forks:_ : Forks -> State .
+
+    op __ : State State -> State [assoc comm] .
+
+    op init : -> State .
+    eq init = ((p[phi(1)]: thinking, 0) 
+    (p[phi(2)]: thinking, 0) 
+    (p[phi(3)]: thinking, 0) 
+    (p[phi(4)]: thinking, 0) 
+    (p[phi(5)]: thinking, 0))
+    (forks: (fork(1) fork(2) fork(3) fork(4) fork(5))) .
+
+    var N N1 F : Nat .
+    var FS : Forks .
+
+    op canUse : Nat Nat -> Bool .
+    eq canUse(N, N1) = (N == N1) or (N == N1 + 1) or (N == 1 and N1 == 5) .
+
+--- naive solution with no limitation
+    --- rl[hungry] : (p[phi(N)]: thinking, F) => (p[phi(N)]: hungry, F) .
+    --- crl[getFork] : (p[phi(N)]: hungry, F) (forks: (fork(N1) FS)) => (p[phi(N)]: hungry, F + 1) (forks: FS) if canUse(N, N1) .
+    --- rl[eat] : (p[phi(N)]: hungry, 2) => (p[phi(N)]: eating, 2) .
+    --- rl[putFork] : (p[phi(N)]: eating, 2) (forks: FS) => (p[phi(N)]: thinking, 0) (forks: (FS fork(N) fork(if (N == 1) then 5 else sd(N, 1) fi))) .
+
+--- approved solution-1: maybe unfair for some philosopher
+    --- rl[hungry] : (p[phi(N)]: thinking, F) => (p[phi(N)]: hungry, F) .
+    --- --- 奇数的哲学家要先拿左手边的叉子
+    --- crl[getFork] : (p[phi(N)]: hungry, 0) (forks: (fork(N) FS)) => (p[phi(N)]: hungry, 1) (forks: FS) if (N rem 2) == 1 .
+    --- --- 偶数的哲学家要先拿右手边的叉子
+    --- crl[getFork] : (p[phi(N)]: hungry, 0) (forks: (fork(sd(N, 1)) FS)) => (p[phi(N)]: hungry, 1) (forks: FS) if (N rem 2) == 0 .
+    --- --- 如果哲学家已经拿起一个叉子 则没有额外限制
+    --- crl[getFork] : (p[phi(N)]: hungry, F) (forks: (fork(N1) FS)) => (p[phi(N)]: hungry, F + 1) (forks: FS) if F =/= 0 and canUse(N, N1) .
+    --- rl[eat] : (p[phi(N)]: hungry, 2) => (p[phi(N)]: eating, 2) .
+    --- rl[putFork] : (p[phi(N)]: eating, 2) (forks: FS) => (p[phi(N)]: thinking, 0) (forks: (FS fork(N) fork(if (N == 1) then 5 else sd(N, 1) fi))) .
+
+--- approved solution-2: 每个哲学家都先拿编号大的叉子
+    rl[hungry] : (p[phi(N)]: thinking, F) => (p[phi(N)]: hungry, F) .
+    rl[getFork] : (p[phi(1)]: hungry, 0) (forks: (fork(5) FS)) => (p[phi(1)]: hungry, 1) (forks: FS) .
+    crl[getFork] : (p[phi(N)]: hungry, 0) (forks: (fork(N) FS)) => (p[phi(N)]: hungry, 1) (forks: FS) if N =/= 1 .
+    --- 如果哲学家已经拿起一个叉子 则没有额外限制
+    crl[getFork] : (p[phi(N)]: hungry, F) (forks: (fork(N1) FS)) => (p[phi(N)]: hungry, F + 1) (forks: FS) if F =/= 0 and canUse(N, N1) .
+    rl[eat] : (p[phi(N)]: hungry, 2) => (p[phi(N)]: eating, 2) .
+    rl[putFork] : (p[phi(N)]: eating, 2) (forks: FS) => (p[phi(N)]: thinking, 0) (forks: (FS fork(N) fork(if (N == 1) then 5 else sd(N, 1) fi))) .
+
+endm
+
