@@ -1,0 +1,53 @@
+mod READER-WRITER-2-PREDS is
+    including SATISFACTION .
+    including PID .
+    including READER-WRITER-2 .
+    subsort Config < State .
+
+    op critical : Pid -> Prop .
+    op waiting : Pid -> Prop .
+    op waitingrw : Pid -> Prop .
+    op residual : Pid -> Prop .
+
+    var i : NzNat .
+    var P : Prop .
+    vars C C1 C2 : Config .
+
+    eq (wp[p(i)]: cs) C2 |= critical(p(i)) = true .
+    eq C1 (wp[p(i)]: cs) C2 |= critical(p(i)) = true .
+    eq C1 (wp[p(i)]: cs) |= critical(p(i)) = true .
+    eq (wp[p(i)]: cs) |= critical(p(i)) = true .
+
+    eq C1 (rp[p(i)]: cs) |= critical(p(i)) = true .
+    eq C1 (rp[p(i)]: cs) C2 |= critical(p(i)) = true .
+    eq (rp[p(i)]: cs) C2 |= critical(p(i)) = true .
+    eq (rp[p(i)]: cs) |= critical(p(i)) = true .
+
+    eq C1 (wp[p(i)]: ws) |= waiting(p(i)) = true .
+    eq C1 (wp[p(i)]: ws) C2 |= waiting(p(i)) = true .
+    eq (wp[p(i)]: ws) C2 |= waiting(p(i)) = true .
+    eq (wp[p(i)]: ws) |= waiting(p(i)) = true .
+
+    eq C1 (wp[p(i)]: ws) |= waiting(p(i)) = true .
+    eq C1 (wp[p(i)]: ws) C2 |= waiting(p(i)) = true .
+    eq (wp[p(i)]: ws) C2 |= waiting(p(i)) = true .
+    eq (wp[p(i)]: ws) |= waiting(p(i)) = true .
+
+    eq C1 (rp[p(i)]: ws) |= waiting(p(i)) = true .
+    eq C1 (rp[p(i)]: ws) C2 |= waiting(p(i)) = true .
+    eq (rp[p(i)]: ws) C2 |= waiting(p(i)) = true .
+    eq (rp[p(i)]: ws) |= waiting(p(i)) = true .
+
+    eq C |= P = false [owise] .
+endm
+
+mod READER-WRITER-2-CHECK is
+    protecting READER-WRITER-2-PREDS .
+    including MODEL-CHECKER .
+    including LTL-SIMPLIFIER .
+
+    op ic : -> Config .
+    eq ic = (wp[p(1)]: rs) (wp[p(2)]: rs)
+            (rp[p(4)]: rs) (rp[p(5)]: rs)
+            (readers: 0) (waitQueue: empty) (waitRwQueue: empty) .
+endm
