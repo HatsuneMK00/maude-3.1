@@ -31,7 +31,6 @@ mod READER-WRITER-1 is
                     if count == 0 .
     
     rl [writer-wait] : (wp[p(i)]: rs) (queue: Q) => (wp[p(i)]: ws) (queue: enq(Q, p(i))) .
-
     crl [reader-try-1] : (rp[p(i)]: rs) (readers: count) => 
                     (rp[p(i)]: cs) (readers: (count + 1))
                     if count > 0 .
@@ -40,7 +39,6 @@ mod READER-WRITER-1 is
                     (rp[p(i)]: cs) (readers: (count + 1)) (queue: (p(i) | Q)) .
 
     rl [writer-try] : (wp[p(i)]: ws) (queue: (p(i) | Q)) => (wp[p(i)]: cs) (queue: (p(i) | Q)) .
-
     crl [reader-exit-1] : (rp[p(i)]: cs) (readers: count) => 
                         (rp[p(i)]: rs) (readers: sd(count, 1)) 
                         if count > 1 .

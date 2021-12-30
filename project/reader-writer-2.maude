@@ -28,9 +28,7 @@ mod READER-WRITER-2 is
     vars QRW QW  : Queue .
 
     rl [reader-wait] : (rp[p(i)]: rs) (waitQueue: QW) => (rp[p(i)]: ws) (waitQueue: enq(QW, p(i))) .
-    
     rl [writer-wait] : (wp[p(i)]: rs) (waitQueue: QW) => (wp[p(i)]: ws) (waitQueue: enq(QW, p(i))) .
-
     crl [reader-wait-rw] : (rp[p(i)]: ws) (readers: count) (waitQueue: (p(i) | QW)) (waitRwQueue: QRW) => 
                     (rp[p(i)]: wrws) (readers: count) (waitQueue: (p(i) | QW)) (waitRwQueue: enq(QRW, p(i))) 
                     if count == 0 .
