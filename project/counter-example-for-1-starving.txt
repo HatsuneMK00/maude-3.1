@@ -1,10 +1,12 @@
-{queue: empty readers: 0 (wp[p(1)]: rs) (wp[p(2)]: rs) (rp[p(4)]: rs) rp[p(5)]: rs, 'reader-wait}
-{queue: (p(4) | empty) readers: 0 (wp[p(1)]: rs) (wp[p(2)]: rs) (rp[p(4)]: ws) rp[p(5)]: rs, 'reader-wait}
-{queue: (p(4) | p(5) | empty) readers: 0 (wp[p(1)]: rs) (wp[p(2)]: rs) (rp[p(4)]: ws) rp[p(5)]: ws, 'writer-wait}
-{queue: (p(4) | p(5) | p(1) | empty) readers: 0 (wp[p(1)]: ws) (wp[p(2)]: rs) (rp[p(4)]: ws) rp[p(5)]: ws, 'writer-wait}
-{queue: (p(4) | p(5) | p(1) | p(2) | empty) readers: 0 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: ws) rp[p(5)]: ws, 'reader-try-2}
-{queue: (p(4) | p(5) | p(1) | p(2) | empty) readers: 1     (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: cs) rp[p(5)]: ws, 'reader-exit-2}
-{queue: (p(5) | p(1) | p(2) | empty) readers: 0 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: rs) rp[p(5)]: ws, 'reader-try-2}
-{queue: (p(5) | p(1) | p(2) | empty) readers: 1 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: rs) rp[p(5)]: cs, 'reader-try-1}
-{queue: (p(5) | p(1) | p(2) | empty) readers: 2 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: cs) rp[p(5)]: cs, 'reader-exit-1}
-{queue: (p(5) | p(1) | p(2) | empty) readers: 1 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: cs) rp[p(5)]: rs, 'reader-try-1}
+{queue: empty readers: 0 (wp[p(1)]: rs) (wp[p(2)]: rs) (rp[p(4)]: rs) rp[p(5)]: rs, 'reader-wait'}
+{queue: (p(4) | empty) readers: 0 (wp[p(1)]: rs) (wp[p(2)]: rs) (rp[p(4)]: ws) rp[p(5)]: rs, 'reader-wait'}
+{queue: (p(4) | p(5) | empty) readers: 0 (wp[p(1)]: rs) (wp[p(2)]: rs) (rp[p(4)]: ws) rp[p(5)]: ws, 'writer-wait'}
+{queue: (p(4) | p(5) | p(1) | empty) readers: 0 (wp[p(1)]: ws) (wp[p(2)]: rs) (rp[p(4)]: ws) rp[p(5)]: ws, 'writer-wait'}
+{queue: (p(4) | p(5) | p(1) | p(2) | empty) readers: 0 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: ws) rp[p(5)]: ws, 'reader-try-2'}
+{queue: (p(4) | p(5) | p(1) | p(2) | empty) readers: 1     (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: cs) rp[p(5)]: ws, 'reader-exit-2'}
+{queue: (p(5) | p(1) | p(2) | empty) readers: 0 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: rs) rp[p(5)]: ws, 'reader-try-2'}
+{queue: (p(5) | p(1) | p(2) | empty) readers: 1 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: rs) rp[p(5)]: cs, 'reader-try-1'}
+{queue: (p(5) | p(1) | p(2) | empty) readers: 2 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: cs) rp[p(5)]: cs, 'reader-exit-1'}
+{queue: (p(5) | p(1) | p(2) | empty) readers: 1 (wp[p(1)]: ws) (wp[p(2)]: ws) (rp[p(4)]: cs) rp[p(5)]: rs, 'reader-try-1'}
+
+
